@@ -1,0 +1,204 @@
+package com.offer.service;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+import com.offer.exception.InvalidDateFormatException;
+import com.offer.exception.InvalidSubOfferNameException;
+import com.offer.exception.InvalidValidityException;
+import com.offer.exception.OfferNameAlreadyExistsException;
+import com.offer.exception.OfferNotFoundException;
+import com.offer.model.Offer;
+import com.offer.model.SubOffer;
+import com.offer.repository.IOfferRepository;
+import com.offer.repository.ISubOfferRepository;
+import com.offer.validator.OfferNameValidator;
+import com.offer.validator.ValidityValidator;
+
+import jakarta.transaction.Transactional;
+@Service
+public class OfferServiceImpl implements IOfferService {
+	
+	//Injecting Offer Repository dependency.
+	@Autowired
+	private IOfferRepository offerRepo;
+	
+	//Injecting Sub-Offer Repository dependency.
+	@Autowired
+	private ISubOfferService subofferService;
+	
+	
+	//Add Offer with suboffers.
+	@Override
+	public Offer addOffer(Offer ofObj) {
+		// Validate and add only Activation Date and Expiration Date    
+	    if (isValidDate(ofObj.getActivationDate()) && isValidDate(ofObj.getExpirationDate())) {
+	    	
+	    	//Check if offer name is already present or not.
+	    	Offer existingOffer = offerRepo.findByOfferName(ofObj.getOfferName());
+            
+	    	//If offer name exists throw exception.
+	    	if (existingOffer != null) {
+                throw new OfferNameAlreadyExistsException("Offer with name '" + ofObj.getOfferName() + "' already exists.");
+            }
+	    	
+	    	
+	    	//Now add suboffers.
+	    	for (SubOffer subOffer : ofObj.getSubOffers()) {
+	    		OfferNameValidator validator = new OfferNameValidator();
+	    		ValidityValidator validatorValidity = new ValidityValidator();
+	    		
+	    		//Sub-Offer name validation
+	    		if(!validator.isValid(subOffer.getSubOfferName(),null)) {
+	            	throw new InvalidSubOfferNameException("Sub Offer Name should not exceed 30 characters and can only contain letters, numbers, spaces, hyphens, and dollar signs");
+	            }
+	    		
+	    		//Check Validity "Validity should in multiples of a week "
+	    		if(!validatorValidity.isValid(subOffer.getValidity(), null)) {
+	            	throw new InvalidValidityException("Invalid Validity; Validity should be in multiples of a week");
+	            }
+	    		//Save suboffer.
+		        subOffer.setOffer(ofObj);
+		    }
+	    	
+	    	//Save offer.
+		    return offerRepo.save(ofObj);
+	    }
+	    throw new IllegalArgumentException("Date should be in format 'dd-MM-yyyy'");
+	}
+	
+	
+	//Update offer with/without suboffer
+	@Override
+	public Offer updateOffer(Offer ofObj) {
+		
+		//get existing data related to that offer.
+		Optional<Offer> existingOfferOpt = offerRepo.findById(ofObj.getId());
+		
+	    if (existingOfferOpt.isPresent()) {
+	        Offer existingOffer = existingOfferOpt.get();
+	        
+	        // Validate and update only Activation Date and Expiration Date
+	        if (isValidDate(ofObj.getActivationDate()) && isValidDate(ofObj.getExpirationDate())) {
+	            
+	        	//Update Activation Date if it is sent to update
+	        	if(ofObj.getActivationDate()!=null) {
+	            	existingOffer.setActivationDate(ofObj.getActivationDate());
+	            }
+	        	
+	        	//Update Expiration Date if it is sent to update
+	            if(ofObj.getExpirationDate()!=null) {
+	            	existingOffer.setExpirationDate(ofObj.getExpirationDate());
+	            }
+	            
+	            if(ofObj.getSubOffers() != null) {
+	            	System.out.println("Not empty");
+	            	for (SubOffer subOffer : ofObj.getSubOffers()) {
+	            		OfferNameValidator validator = new OfferNameValidator();
+	    	    		ValidityValidator validatorValidity = new ValidityValidator();
+	    	    		
+	    	    		if(subOffer.getSubOfferName()!=null) {
+	    	    			if(!validator.isValid(subOffer.getSubOfferName(),null)) {
+		    	            	throw new InvalidSubOfferNameException("Sub Offer Name should not exceed 30 characters and can only contain letters, numbers, spaces, hyphens, and dollar signs");
+		    	            }
+	    	    		}
+	    	    		
+	    	    		if(subOffer.getValidity()!=null) {
+	    	    			if(!validatorValidity.isValid(subOffer.getValidity(), null)) {
+		    	            	throw new InvalidValidityException("Invalid Validity; Validity should be in multiples of a week");
+		    	            }
+	    	    		}
+	    	    		
+	    	    		
+	            		System.out.println(subOffer);
+	            		this.subofferService.updateSubOffer(subOffer);
+	        	    }
+	            }
+	            return offerRepo.save(existingOffer);
+	        } else {
+	            throw new IllegalArgumentException("Invalid date format or values.");
+	        }
+	    } else {
+	        throw new RuntimeException("Offer not found with ID: " + ofObj.getId());
+	    }
+	}
+	
+
+	@Override
+	public List<Offer> getAllOffers() {
+		return offerRepo.findAll();
+	}
+
+	@Override
+	public String deleteOffer(Long offer_id) {
+		Optional<Offer> offer = offerRepo.findById(offer_id);
+        if (offer.isPresent()) {
+            offerRepo.delete(offer.get());
+            return "Offer with ID " + offer_id + " deleted successfully.";
+        } else {
+        	throw new OfferNotFoundException("Offer not found with ID: " + offer_id);
+        }
+	}
+	
+	 @Override
+	    public List<Offer> getVisibleOffers() {
+		 	System.out.println("here");
+	        LocalDate currentDate = LocalDate.now();
+	        System.out.println("here "+currentDate);
+	        LocalDate currentDateAsDate = convertToLocalDate(currentDate); // Convert LocalDate to Date
+	        System.out.println("currentDateAsDate "+currentDateAsDate);
+	        return offerRepo.findByActivationDateBeforeAndExpirationDateAfter(currentDateAsDate,currentDateAsDate);
+	    }
+	
+	 private static final DateTimeFormatter EXPECTED_FORMATTER = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+	 private boolean isValidDate(LocalDate localDate) {
+		    System.out.println("Date: " + localDate);
+		    String formattedDate = localDate.format(EXPECTED_FORMATTER);
+	        LocalDate parsedDate = LocalDate.parse(formattedDate, EXPECTED_FORMATTER);
+	        if(parsedDate.equals(localDate)) {
+	        	return true;
+	        }
+		     throw new InvalidDateFormatException("Invalid date format: " + localDate);
+		   
+		}
+
+	@Override
+	public Offer getOfferWithSubOffersById(Long offerId) {
+	    return offerRepo.findOfferWithSubOffers(offerId);
+	}
+	
+	@Override
+    @Transactional
+    public String deleteOfferAndSubOffers(Long offerId) {
+        Offer offer = getOfferWithSubOffersById(offerId);
+        
+        for (SubOffer subOffer : offer.getSubOffers()) {
+            subofferService.deleteSubOffer(subOffer.getSubOfferId());
+        }
+        
+        offerRepo.delete(offer);
+        return "Offer Deleted Successfully";
+    }
+	
+	public static LocalDate convertToLocalDate(LocalDate localDate) {
+        try {
+            DateTimeFormatter outputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+            
+            String formattedOutputDateStr = localDate.format(outputFormatter);
+
+            LocalDate convertedLocalDate = LocalDate.parse(formattedOutputDateStr, inputFormatter);
+            System.out.println("Converted LocalDate: " + convertedLocalDate);
+            return convertedLocalDate;
+        } catch (Exception e) {
+            System.out.println("Exception: " + e.getMessage());
+            return null;
+        }
+    }
+
+}

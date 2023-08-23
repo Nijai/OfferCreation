@@ -1,0 +1,12 @@
+package com.offer.service;
+
+import org.springframework.stereotype.Service;
+
+import com.offer.model.Offer;
+
+@Service
+public interface IOfferService {
+	public Offer addOffer(Offer ofObj);
+	public Offer updateOffer(Offer ofObj);
+	
+}

@@ -1,0 +1,83 @@
+package com.offer.controller;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.offer.exception.ParentRelationModificationException;
+import com.offer.model.SubOffer;
+import com.offer.service.ISubOfferService;
+
+@RestController
+@RequestMapping("/api/suboffers")
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = {"Content-Type", "application/json"}, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+public class SubOfferController {
+
+    @Autowired
+    private ISubOfferService subOfferService;
+
+    @PostMapping("/createSubOffer")
+    public ResponseEntity<SubOffer> addSubOffer(@RequestBody SubOffer subOffer) {
+        SubOffer addedSubOffer = subOfferService.addSubOffer(subOffer);
+        return new ResponseEntity<>(addedSubOffer, HttpStatus.CREATED);
+    }
+
+    @PutMapping("/updateSubOffer/{subOfferId}")
+    public ResponseEntity<?> updateSubOffer(@PathVariable Long subOfferId, @RequestBody SubOffer subOffer) {
+        subOffer.setSubOfferId(subOfferId); // Set the ID from the path variable
+        try {
+            SubOffer updatedSubOffer = subOfferService.updateSubOffer(subOffer);
+            return new ResponseEntity<>(updatedSubOffer, HttpStatus.OK);
+        } catch (ParentRelationModificationException e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getSubOfferById/{subOfferId}")
+    public ResponseEntity<SubOffer> getSubOfferById(@PathVariable Long subOfferId) {
+        try {
+            SubOffer subOffer = subOfferService.getSubOfferById(subOfferId);
+            return new ResponseEntity<>(subOffer, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getAllSubOffers")
+    public ResponseEntity<List<SubOffer>> getAllSubOffers() {
+        List<SubOffer> subOffers = subOfferService.getAllSubOffers();
+        return new ResponseEntity<>(subOffers, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteSubOffer/{subOfferId}")
+    public ResponseEntity<String> deleteSubOffer(@PathVariable Long subOfferId) {
+        String response = subOfferService.deleteSubOffer(subOfferId);
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
+    
+    
+    @GetMapping("/getOptional/{offer_id}")
+    public ResponseEntity<?> getOptionalSubOffers(@PathVariable Long offer_id) {
+        try {
+            // Call the service to retrieve optional sub-offers by offer ID
+            List<SubOffer> optionalSubOffers = subOfferService.getOptionalSubOffersByOfferId(offer_id);
+            
+            if (optionalSubOffers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            
+            return ResponseEntity.ok(optionalSubOffers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @ExceptionHandler(ParentRelationModificationException.class)
+    public ResponseEntity<String> handleParentRelationModificationException(ParentRelationModificationException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+}

@@ -1,0 +1,21 @@
+package com.offer.model;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.DeserializationContext;
+import com.fasterxml.jackson.databind.JsonDeserializer;
+import java.time.format.DateTimeFormatter;
+
+
+public class CustomDateDeserializer extends JsonDeserializer<LocalDate> {
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    @Override
+    public LocalDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        String dateString = jsonParser.getText();
+        System.out.println("dateString "+dateString);
+        return LocalDate.parse(dateString, DATE_FORMAT);
+    }
+}
+

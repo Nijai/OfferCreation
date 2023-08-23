@@ -1,0 +1,5 @@
+package com.offer.service;
+
+public interface ISubOfferService {
+
+}

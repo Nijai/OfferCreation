@@ -1,0 +1,163 @@
+    /* Styling for the card container */
+    .card-container {
+        display: flex;
+        align-items: center;
+        overflow-x: scroll;
+        padding: 10px;
+        position: relative;
+        margin-top: 5%;
+      }
+    
+    .cards {
+        display: flex;
+        gap: 20px;
+      }
+      
+      .card-content {
+        margin-top: 10%;
+      }
+    .card {
+        border: 1px solid #ccc;
+        padding: 20px;
+        min-width: 250px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+        position: relative; /* Ensure relative positioning for ribbon */
+      }
+    
+    .ribbon {
+        position: absolute;
+        top: 3px;
+        left: -10px; /* Adjust left position for ribbon */
+        transform: rotate(0deg); /* Rotate the ribbon */
+        background-color: #08ACAC;
+        color: #fff;
+        padding: 5px 20px; /* Adjust padding for ribbon */
+        border-radius: 5px;
+        z-index: 1; /* Ensure the ribbon is above the card content */
+        box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+    
+    /* Styling for the select button */
+    .select-button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    
+    /* Styling for the selected offer details */
+    .selected-offer-details {
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    
+    /* Styling for the arrow buttons */
+    .scroll-button {
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        border-radius: 50%;
+        cursor: pointer;
+    }
+    
+    .scroll-button.right {
+        margin-left: 10px;
+    }
+    /* Styling for the selected offer details */
+    .selected-offer-details {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        margin-top: 20px;
+        padding: 20px;
+        border: 1px solid #ccc;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    
+    .upper-section {
+        margin-bottom: 20px;
+    }
+    
+    /* Styling for suboffer cards */
+    .suboffer-cards {
+        display: flex;
+        justify-content: center; /* Center align the suboffer cards */
+        gap: 20px;
+        margin-top: 20px; /* Add some margin to the top for spacing */
+    }
+    
+    .suboffer-card {
+        flex: 0 0 calc(33.33% - 20px); /* Adjust width for 3 cards in a row */
+        border: 1px solid #ccc;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        background-color: #fff;
+    }
+    .select-button[disabled] {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    .suboffer {
+        margin: 0;
+    }
+    
+    .add-button {
+        background-color: #007bff;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    .add-button[disabled] {
+        background-color: #ccc;
+        cursor: not-allowed;
+    }
+    .proceed-btn{
+        background-color: #046c6c;
+        color: #fff;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin: 2%;
+        width: 20%;
+    }
+    @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0; }
+        100% { opacity: 1; }
+      }
+      
+      .flash-text {
+        color:red;
+        animation: blink 1s infinite;
+      }
+
+      .select-button.selected,
+        .add-button.selected {
+            background-color: #46b846; /* Change to a different color for selected effect */
+        }
+        /* Add these styles for the snackbar */
+.snackbar {
+    transform: translateX(-50%);
+    background-color: #048f6c;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    transition: visibility 0s, opacity 0.3s ease-in-out;
+  }
+  

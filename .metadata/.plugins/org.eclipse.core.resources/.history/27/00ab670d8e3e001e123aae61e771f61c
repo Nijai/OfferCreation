@@ -1,0 +1,61 @@
+package com.offer.model;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.*;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
+
+import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@Configuration
+public class JacksonConfig {
+	
+	 @Bean
+	    public ObjectMapper objectMapper() {
+	        return Jackson2ObjectMapperBuilder.json()
+	                .modules(new JavaTimeModule()) // Register the JavaTimeModule
+	                .build();
+	    }
+//	 
+//    @Bean
+//    public ObjectMapper objectMapper() {
+//        SimpleModule module = new SimpleModule();
+//        module.addSerializer(Date.class, new CustomDateSerializer());
+//        module.addDeserializer(Date.class, new CustomDateDeserializer());
+//
+//        return Jackson2ObjectMapperBuilder.json()
+//                .modules(module)
+//                .build();
+//    }
+
+    private static class CustomDateSerializer extends JsonSerializer<Date> {
+        private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+        @Override
+        public void serialize(Date date, JsonGenerator gen, SerializerProvider provider) throws IOException {
+            gen.writeString(dateFormat.format(date));
+        }
+    }
+
+    private static class CustomDateDeserializer extends JsonDeserializer<Date> {
+        private SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+
+        @Override
+        public Date deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+            try {
+                return dateFormat.parse(p.getValueAsString());
+            } catch (ParseException e) {
+                throw new IOException(e);
+            }
+        }
+    }
+}
+

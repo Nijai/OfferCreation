@@ -1,0 +1,15 @@
+package com.offer.model;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+public class OfferTypeValidator implements ConstraintValidator<Offer.OfferTypeValidation, String> {
+
+    @Override
+    public void initialize(Offer.OfferTypeValidation constraintAnnotation) {
+    }
+
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        return value != null && (value.equals("Unlimited") || value.equals("Topup") || value.equals("Validity") || value.equals("OTT Offers"));
+    }
+}

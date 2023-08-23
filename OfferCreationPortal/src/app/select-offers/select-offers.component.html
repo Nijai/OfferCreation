@@ -1,0 +1,40 @@
+<div class="card-container">
+    <div class="cards">
+      <div *ngFor="let offer of offers" class="card">
+        <div class="ribbon">{{ offer.offerName }}</div>
+        <div class="card-content">
+          <h3>{{ offer.offerDescription }}</h3>
+          <p><strong>Offer Type:</strong> {{ offer.offerType }}</p>
+          <p class="flash-text"><strong>Offer Valid till:</strong> {{ offer.expirationDate }}</p>
+          <button (click)="selectOffer(offer)" class="select-button">Select</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="selectedOffer" class="selected-offer-details">
+    <div class="upper-section card">
+      <h2>Selected Offer Details</h2>
+      <h3 style="color:#08ACAC;">{{ selectedOffer.offerName }}</h3>
+      <p style="color:#036969;"><em>{{ selectedOffer.offerDescription }}</em></p>
+      <p><strong>Offer Type:</strong> {{ selectedOffer.offerType }}</p>
+      <p class="flash-text"><strong>Offer Valid till:</strong> {{ selectedOffer.expirationDate }}</p>
+    </div>
+    <h2>Select Suboffers (Optional)</h2>
+    <div class="suboffer-cards">
+      <div *ngFor="let subOffer of selectedOffer.subOffers" class="suboffer-card">
+        <div class="suboffer">
+          <h4 style="color:#08ACAC;">{{ subOffer.subOfferName }}</h4>
+          <p>Price: {{ subOffer.price }}</p>
+          <p>Validity: {{ subOffer.validity }} days</p>
+          <button class="add-button" [disabled]="subOffer.parentRelation === 'M' || subOffer.parentRelation === 'D' || disable" (click)="selectSubOffer(subOffer)">Add</button>
+        </div>
+      </div>
+    </div>
+    <div *ngIf="showSnackbar" class="snackbar">
+      {{ snackbarMessage }}
+    </div>
+    <button class="button proceed-btn" (click)="proceed()">Proceed</button>
+  </div>
+
+  

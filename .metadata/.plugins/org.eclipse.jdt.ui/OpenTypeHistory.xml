@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<typeInfoHistroy>
+    <typeInfo handle="=OfferCreation/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.offer.repository{IOfferRepository.java[IOfferRepository" modifiers="513" timestamp="1692680029894"/>
+    <typeInfo handle="=OfferCreation/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.offer.service{IOfferService.java[IOfferService" modifiers="513" timestamp="1692678682204"/>
+    <typeInfo handle="=OfferCreation/src\/main\/java=/optional=/true=/=/maven.pomderived=/true=/&lt;com.offer.service{ISubOfferService.java[ISubOfferService" modifiers="513" timestamp="1692678939351"/>
+    <typeInfo handle="=OfferCreation/C:\/Users\/p1357922\/.m2\/repository\/org\/springframework\/data\/spring-data-jpa\/3.1.2\/spring-data-jpa-3.1.2.jar=/maven.pomderived=/true=/=/maven.groupId=/org.springframework.data=/=/maven.artifactId=/spring-data-jpa=/=/maven.version=/3.1.2=/=/maven.scope=/compile=/=/maven.pomderived=/true=/&lt;org.springframework.data.jpa.repository(JpaRepository.class[JpaRepository" modifiers="1537" timestamp="1692340884008"/>
+</typeInfoHistroy>

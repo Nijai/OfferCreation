@@ -1,0 +1,165 @@
+package com.offer.controller;
+
+import java.time.LocalDate;
+import java.util.*;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import com.offer.exception.InvalidDateFormatException;
+import com.offer.model.Offer;
+import com.offer.model.ParentRelation;
+import com.offer.model.SubOffer;
+import com.offer.service.IOfferService;
+import com.offer.service.ISubOfferService;
+
+import jakarta.validation.Valid;
+
+import com.offer.model.*;
+@RestController
+@RequestMapping("/api/offers")
+@CrossOrigin(origins = "http://localhost:4200", allowedHeaders = {"Content-Type", "application/json"}, methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
+public class OfferController {
+
+	//Injecting OfferService dependency.
+    @Autowired
+    private IOfferService offerService;
+
+    //Injecting SubOfferService dependency.
+    @Autowired
+    private ISubOfferService subOfferService;
+    
+    
+    
+    //Adding Offer with Sub-offer using post mapping.
+    @PostMapping("/createOffer")
+    public ResponseEntity<?> addOffer(@RequestBody Offer offer) {
+        try {
+        	
+        	//Initialize validators.
+        	OfferNameValidator validator = new OfferNameValidator();
+        	OfferTypeValidator typeValidator = new OfferTypeValidator();
+        	
+        	//Check condition "One Offer should have at least one sub offer".
+        	if (offer.getSubOffers() == null || offer.getSubOffers().isEmpty()) {
+    	        throw new IllegalArgumentException("At least one sub-Offer is required.");
+    	    }
+        	
+        	//Check condition "Offer Name/Sub Offer Name should not be greater than 30 characters 
+        	// and can only add – (Hyphen) $(Dollar Sign) as special characters "
+            if(!validator.isValid(offer.getOfferName(),null)) {
+            	return new ResponseEntity<>("Offer Name should not exceed 30 characters and can only contain letters, numbers, spaces, hyphens, and dollar signs", HttpStatus.BAD_REQUEST);
+            }
+            
+            //Check Condition "Offer Type  should be one of the defined values and should not accept any other values" 
+            if(!typeValidator.isValid(offer.getOfferType(), null)) {
+            	return new ResponseEntity<>("Invalid Offer Type; Offer Type should be one of the below values ->	Unlimited,	Topup,	Validity,	OTT Offers",HttpStatus.BAD_REQUEST);
+            }
+            
+            //Everything well Let's add.
+            Offer addedOffer = this.offerService.addOffer(offer);
+            return new ResponseEntity<>(addedOffer, HttpStatus.CREATED);
+            
+        } catch (IllegalArgumentException e) {
+        	System.out.println("Error in adding: "+e.getMessage());
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    
+    //Updating Offer with or without suboffer using Put mapping.
+    @PutMapping("/updateOffer/{offerId}")
+    public ResponseEntity<?> updateOffer(@PathVariable Long offerId, @RequestBody Offer offer) {
+       
+    	offer.setId(offerId); // Set the ID from the path variable
+        try {
+        	//Only Date to be updated.
+            Offer updatedOffer = this.offerService.updateOffer(offer);
+            return new ResponseEntity<>(updatedOffer, HttpStatus.OK);
+            
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("Cannot Update offer "+e.getMessage(),HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    
+    //Get Offer with suboffers through OfferID provided.
+    @GetMapping("/getOfferById/{offerId}")
+    public ResponseEntity<?> getOfferById(@PathVariable Long offerId) {
+        try {
+            Offer offer = this.offerService.getOfferWithSubOffersById(offerId);
+            System.out.println(offer.getSubOffers());
+            
+            
+            return new ResponseEntity<>(offer, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>("No such Offer Present",HttpStatus.NOT_FOUND);
+        }
+    }
+
+
+    @GetMapping("/getAllOffers")
+    public ResponseEntity<List<Offer>> getAllOffers() {
+        List<Offer> offers = offerService.getAllOffers();
+        return new ResponseEntity<>(offers, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/deleteOffer/{offerId}")
+    public ResponseEntity<String> deleteOffer(@PathVariable Long offerId) {
+        try {
+            String response = offerService.deleteOfferAndSubOffers(offerId);
+            return new ResponseEntity<>(response, HttpStatus.OK);
+        } catch (Exception e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @GetMapping("/getAllOffers/visible")
+    public ResponseEntity<?> getVisibleOffers() {
+    	try {
+    		System.out.println("try");
+    		List<Offer> visibleOffers = this.offerService.getVisibleOffers();
+    		return new ResponseEntity<>(visibleOffers, HttpStatus.OK);
+    	}catch (Exception e) {
+    		return new ResponseEntity<>("No Such offers "+e.getMessage(),HttpStatus.NOT_FOUND);
+    	}
+    }
+
+    	
+    @GetMapping("/getOptional/{offer_id}")
+    public ResponseEntity<?> getOptionalSubOffers(@PathVariable Long offer_id) {
+        try {
+            // Call the service to retrieve optional sub-offers by offer ID
+            List<SubOffer> optionalSubOffers = subOfferService.getOptionalSubOffersByOfferId(offer_id);
+            
+            if (optionalSubOffers.isEmpty()) {
+                return ResponseEntity.noContent().build();
+            }
+            
+            return ResponseEntity.ok(optionalSubOffers);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+    
+    @GetMapping("/selectOffer/{offer_id}/{suboffers}")
+    public ResponseEntity<?> selectOfferWithSubOffer(@PathVariable Long offer_id,@PathVariable String suboffers){
+    	
+        	return this.subOfferService.getAmountToBePaid(offer_id,suboffers);
+        	
+    }
+    @GetMapping("/selectOffer/{offer_id}")
+    public ResponseEntity<?> selectOfferID(@PathVariable Long offer_id){
+    	
+        	return this.subOfferService.getAmountToBePaid(offer_id,"0");
+        	
+    }
+    
+    
+    
+    @ExceptionHandler(InvalidDateFormatException.class)
+    public ResponseEntity<String> handleInvalidDateFormatException(InvalidDateFormatException ex) {
+        return new ResponseEntity<>(ex.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+}

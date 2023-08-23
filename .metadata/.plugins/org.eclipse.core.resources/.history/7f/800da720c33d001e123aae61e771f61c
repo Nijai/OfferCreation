@@ -1,0 +1,18 @@
+package com.offer.service;
+
+import java.util.List;
+
+import com.offer.model.Offer;
+import com.offer.model.SubOffer;
+
+
+public interface IOfferService {
+	public Offer addOffer(Offer ofObj);
+	public Offer updateOffer(Offer ofObj);
+	public Offer getOfferById(Long offer_id);
+	public List<Offer> getAllOffers();
+	public String deleteOffer(Long offer_id);
+	public List<Offer> getVisibleOffers();
+	public Offer getOfferWithSubOffersById(Long offerId);
+
+}

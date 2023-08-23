@@ -1,0 +1,51 @@
+<div class="full-width-section">
+    <div class="full-width-content">
+      <p>Amount to be Paid: {{ amount }}</p>
+      <button class="pay-now-button" (click)="openPopup()">Pay Now</button>
+    </div>
+  </div>
+<div *ngIf="OfferData" class="selected-offer-details">
+    <div class="upper-section card">
+      <h2>Selected Offer Details</h2>
+      <h3 style="color:#08ACAC;">{{ OfferData.offerName }}</h3>
+      <p style="color:#036969;"><em>{{ OfferData.offerDescription }}</em></p>
+      <p><strong>Offer Type:</strong> {{ OfferData.offerType }}</p>
+      <p class="flash-text"><strong>Offer Valid till:</strong> {{ OfferData.expirationDate }}</p>
+    </div>
+    <h2>Selected Suboffers</h2>
+    <div class="suboffer-cards">
+      <div *ngFor="let subOffer of suboffer" class="suboffer-card">
+        <div class="suboffer">
+          <h4 style="color:#08ACAC;">{{ subOffer.subOfferName }}</h4>
+          <p>Price: {{ subOffer.price }}</p>
+          <p>Validity: {{ subOffer.validity }} days</p>
+        </div>
+      </div>
+    </div>
+    <h2>Below Are the Default/Mandatory fields</h2>
+      <ng-container *ngFor="let subOffer of OfferData.subOffers">
+        <div *ngIf="subOffer.parentRelation === 'M' || subOffer.parentRelation === 'D'" class="suboffer-card">
+          <div class="suboffer">
+            <h4 style="color:#08ACAC;">{{ subOffer.subOfferName }}</h4>
+            <p>Price: {{ subOffer.price }}</p>
+            <p>Validity: {{ subOffer.validity }} days</p>
+          </div>
+        </div>
+      </ng-container>
+  </div>
+  <div class="full-width-section">
+    <div class="full-width-content">
+      <p>Amount to be Paid: {{ amount }}</p>
+      <button class="pay-now-button" (click)="openPopup()">Pay Now</button>
+    </div>
+  </div>
+  <!-- Popup -->
+<div class="popup" *ngIf="showPopup">
+    <div class="popup-content">
+      <span class="popup-emoji">🎉</span>
+      <p class="popup-message">Congratulations!</p><br>
+      <p>{{ '\u20B9' }} {{amount}} Paid</p>
+      <p>You have successfully purchased this offer.</p>
+      <button class="close-popup-button" (click)="closePopup()">Close</button>
+    </div>
+  </div>

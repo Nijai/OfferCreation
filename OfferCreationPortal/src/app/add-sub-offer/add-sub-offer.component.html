@@ -1,0 +1,35 @@
+
+<div class="form-container">
+    <form class="formContain" [formGroup]="subofferForm" (ngSubmit)="finish()">
+        <h1>Step 2: Add Sub Offer</h1>
+        <hr>
+      <div class="form-group">
+        <label for="subOfferName">Enter Sub offer Name</label>
+        <input type="text" id="subOfferName" formControlName="subOfferName">
+        <span class="error" *ngIf="isInvalid('subOfferName')">Invalid Sub offer Name</span>
+      </div>
+      <div class="form-group">
+        <label for="price">Enter sub offer Price</label>
+        <input type="text" id="price" formControlName="price">
+        <span class="error" *ngIf="isInvalid('price')">Invalid price</span>
+      </div>
+      <div class="form-group">
+        <label for="validity">Enter Validity</label>
+        <input type="text" id="validity" formControlName="validity">
+        <span class="error" *ngIf="isInvalid('validity')">Invalid Validity (should be multiple of weeks.)</span>
+      </div>
+      <div class="form-group">
+        <label for="parentRelation">Sub offer Selection</label>
+        <select id="parentRelation" formControlName="parentRelation">
+            <option value="D">Default</option>
+            <option value="M">Mandatory</option>
+            <option value="O">Optional</option>
+        </select>
+        <span class="error" *ngIf="isInvalid('parentRelation')">Invalid Type</span>
+      </div>
+      <button type="submit" (click)="back()">Back</button>
+      <button type="submit"  (click)="addSuboffer()">Add more Suboffers</button>
+      <button type="submit">Submit</button>
+    </form>
+  </div>
+  

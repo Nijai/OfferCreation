@@ -1,0 +1,16 @@
+package com.offer.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.offer.model.SubOffer;
+
+@Service
+public interface ISubOfferService {
+    SubOffer addSubOffer(SubOffer subOffer);
+    SubOffer updateSubOffer(SubOffer subOffer);
+    SubOffer getSubOfferById(Long subOfferId);
+    List<SubOffer> getAllSubOffers();
+    String deleteSubOffer(Long subOfferId);
+}

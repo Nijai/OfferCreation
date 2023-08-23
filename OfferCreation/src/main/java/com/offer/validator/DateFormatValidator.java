@@ -1,0 +1,32 @@
+package com.offer.validator;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
+import java.util.List;
+
+public class DateFormatValidator implements ConstraintValidator<DateFormatValidation, LocalDate> {
+
+    private static final List<DateTimeFormatter> VALID_FORMATTERS = Arrays.asList(
+            DateTimeFormatter.ofPattern("dd-MM-yyyy")
+    );
+
+    @Override
+    public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true; // Allow null values
+        }
+        return VALID_FORMATTERS.stream().anyMatch(formatter -> {
+            try {
+                formatter.parse(value.toString());
+                return true;
+            } catch (Exception e) {
+                return false;
+            }
+        });
+    }
+}
+

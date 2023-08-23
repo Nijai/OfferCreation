@@ -1,0 +1,9 @@
+package com.offer.model;
+
+import jakarta.validation.ConstraintValidator;
+
+public class OfferNameValidator implements ConstraintValidator<OfferNameValidation, String> {
+	 @Override
+	    public void initialize(OfferNameValidation constraintAnnotation) {
+	    }
+}

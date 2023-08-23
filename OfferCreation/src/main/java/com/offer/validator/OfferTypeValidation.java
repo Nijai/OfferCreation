@@ -1,0 +1,20 @@
+package com.offer.validator;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
+
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+
+@Target({ ElementType.FIELD })
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = OfferTypeValidator.class)
+@Documented
+@interface OfferTypeValidation {
+    String message() default "Invalid Offer Type; Offer Type should be one of the below values ->	Unlimited,	Topup,	Validity,	OTT Offers";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}

@@ -1,0 +1,26 @@
+package com.offer.controller;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.Date;
+
+import com.offer.exception.InvalidDateFormatException;
+
+public class DateValidator {
+
+	private static final String DATE_FORMAT = "dd-MM-yyyy";
+
+	public static boolean isValidDateFormat(LocalDate date) {
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+            String formattedDate = date.format(formatter);
+            LocalDate parsedDate = LocalDate.parse(formattedDate, formatter);
+            return date.equals(parsedDate);
+        } catch (DateTimeParseException e) {
+            return false;
+        }
+    }
+}

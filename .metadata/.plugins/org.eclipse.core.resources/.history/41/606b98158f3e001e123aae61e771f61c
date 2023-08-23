@@ -1,0 +1,32 @@
+package com.offer.model;
+
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+public class DateFormatValidator implements ConstraintValidator<DateFormatValidation, LocalDate> {
+
+    private static final String DATE_FORMAT_PATTERN = "dd-MM-yyyy";
+
+    @Override
+    public void initialize(DateFormatValidation constraintAnnotation) {
+        // No initialization needed
+    }
+
+    @Override
+    public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
+        if (value == null) {
+            return true; // Allow null values
+        }
+
+        try {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT_PATTERN);
+            String formattedDate = value.format(formatter);
+            return formattedDate.equals(value.toString());
+        } catch (Exception e) {
+            return false;
+        }
+    }
+}
+

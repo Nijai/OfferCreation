@@ -1,0 +1,27 @@
+package com.offer.model;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+public class DateFormatValidator implements ConstraintValidator<DateFormatValidation, String> {
+
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        if (value == null || value.isEmpty()) {
+            return true; // Empty values are considered valid
+        }
+
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        try {
+            LocalDate.parse(value, formatter);
+            return true; // Valid date format
+        } catch (DateTimeParseException e) {
+            return false; // Invalid date format
+        }
+    }
+}
+
+

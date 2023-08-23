@@ -1,0 +1,16 @@
+package com.offer.model;
+
+import javax.validation.Constraint;
+import javax.validation.Payload;
+import java.lang.annotation.*;
+
+@Target({ElementType.FIELD})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = {OfferNameValidator.class}) // Note the array syntax here
+@Documented
+public @interface OfferNameValidation {
+    String message() default "Invalid Offer Name/Sub Offer Name";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}
+

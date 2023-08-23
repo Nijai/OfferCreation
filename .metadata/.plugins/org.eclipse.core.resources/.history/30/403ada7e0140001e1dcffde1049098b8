@@ -1,0 +1,193 @@
+	package com.offer.model;
+	
+	import jakarta.persistence.Entity;
+	
+	import java.lang.annotation.Documented;
+	import java.lang.annotation.ElementType;
+	import java.lang.annotation.Retention;
+	import java.lang.annotation.RetentionPolicy;
+	import java.lang.annotation.Target;
+	import java.util.*;
+	import jakarta.persistence.*;
+	import jakarta.persistence.Id;
+	import jakarta.validation.Constraint;
+	import jakarta.validation.Payload;
+import jakarta.validation.constraints.NotEmpty;
+
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+
+import org.hibernate.validator.constraints.Length;
+	import org.springframework.format.annotation.DateTimeFormat;
+
+	import com.fasterxml.jackson.annotation.JsonFormat;
+
+import javax.validation.constraints.NotNull;
+	import javax.validation.constraints.Pattern;
+	import javax.validation.constraints.AssertTrue;
+
+	@Entity
+	@Table(name = "Table_Offer")
+	public class Offer {
+	
+	    @Id
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	    private Long id;
+	
+	    @Length(max = 30, message = "Offer name length must not exceed 30 characters")
+	    @Pattern(regexp = "^[\\w\\s-]*$", message = "Offer name can only contain letters, numbers, spaces, and hyphens")
+	    @NotNull(message = "Offer name is required")
+	    private String offerName;
+	
+	    @Length(max = 50, message = "Offer name length must not exceed 50 characters")
+	    private String offerDescription;
+	
+	    @Length(max = 20, message = "Offer name length must not exceed 20 characters")
+	    @OfferTypeValidation(message = "Invalid Offer Type")
+	    private String offerType;
+
+	    
+
+	    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	    @JsonFormat(pattern = "dd-MM-yyyy")
+	    @Pattern(regexp = "\\d{2}-\\d{2}-\\d{4}", message = "Activation date pattern should be dd-MM-yyyy")
+	    private LocalDate activationDate;
+	
+	    
+	    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+	    @JsonFormat(pattern = "dd-MM-yyyy")
+	    @Pattern(regexp = "\\d{2}-\\d{2}-\\d{4}", message = "Expiration date pattern should be dd-MM-yyyy")
+	    private LocalDate expirationDate;
+	    
+	    
+	    @OneToMany(mappedBy = "offer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+	    private List<SubOffer> subOffers = new ArrayList<>();
+	    
+		public Long getId() {
+			return id;
+		}
+	
+		public void setId(Long id) {
+			this.id = id;
+		}
+	
+		public String getOfferName() {
+			return offerName;
+		}
+	
+		public void setOfferName(String offerName) {
+			this.offerName = offerName;
+		}
+	
+		public String getOfferDescription() {
+			return offerDescription;
+		}
+	
+		public void setOfferDescription(String offerDescription) {
+			this.offerDescription = offerDescription;
+		}
+	
+		public String getOfferType() {
+			return offerType;
+		}
+	
+		public void setOfferType(String offerType) {
+			this.offerType = offerType;
+		}
+	
+		public LocalDate getActivationDate() {
+			return activationDate;
+		}
+	
+		public void setActivationDate(LocalDate activationDate) {
+			this.activationDate = activationDate;
+		}
+	
+		public LocalDate getExpirationDate() {
+			return expirationDate;
+		}
+	
+		public void setExpirationDate(LocalDate expirationDate) {
+			this.expirationDate = expirationDate;
+		}
+		
+		
+	
+		public List<SubOffer> getSubOffers() {
+			return subOffers;
+		}
+	
+		public void setSubOffers(List<SubOffer> subOffers) {
+			System.out.println("<--- suboffer --->");
+			
+			this.subOffers = subOffers;
+			System.out.println(this.subOffers);
+		}
+		
+		public void addSubOffer(SubOffer subOffer) {
+	        subOffers.add(subOffer);
+	        subOffer.setOffer(this);
+	    }
+	
+	    public void removeSubOffer(SubOffer subOffer) {
+	        subOffers.remove(subOffer);
+	        subOffer.setOffer(null);
+	    }
+	
+		public Offer(String offerName, String offerDescription, String offerType, LocalDate activationDate,
+				LocalDate expirationDate) {
+			super();
+			this.offerName = offerName;
+			this.offerDescription = offerDescription;
+			this.offerType = offerType;
+			this.activationDate = activationDate;
+			this.expirationDate = expirationDate;
+		}
+	
+		public Offer() {
+			super();
+		}
+	
+		@Override
+		public String toString() {
+			return "Offer [id=" + id + ", offerName=" + offerName + ", offerDescription=" + offerDescription
+					+ ", offerType=" + offerType + ", activationDate=" + activationDate + ", expirationDate="
+					+ expirationDate + "]";
+		}
+		
+		 @Target({ ElementType.FIELD })
+		    @Retention(RetentionPolicy.RUNTIME)
+		    @Constraint(validatedBy = OfferTypeValidator.class)
+		    @Documented
+		    @interface OfferTypeValidation {
+		        String message() default "Invalid Offer Type";
+		        Class<?>[] groups() default {};
+		        Class<? extends Payload>[] payload() default {};
+		    }
+		 
+		 
+		 
+		 @AssertTrue(message = "Activation Date is not in valid format; Valid format is 'dd-MM-yyyy'")
+		    public boolean isActivationDateFormatValid() {
+		        return isValidDateFormat(activationDate);
+		    }
+
+		    @AssertTrue(message = "Expiration Date is not in valid format; Valid format is 'dd-MM-yyyy'")
+		    public boolean isExpirationDateFormatValid() {
+		        return isValidDateFormat(expirationDate);
+		    }
+
+		    private boolean isValidDateFormat(LocalDate date) {
+		        try {
+		            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+		            String formattedDate = date.format(formatter);
+		            LocalDate parsedDate = LocalDate.parse(formattedDate, formatter);
+		            return date.equals(parsedDate);
+		        } catch (DateTimeParseException e) {
+		            return false;
+		        }
+		    }
+	
+	    
+	}

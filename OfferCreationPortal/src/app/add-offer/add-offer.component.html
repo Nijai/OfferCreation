@@ -1,0 +1,94 @@
+<div class="form-container">
+    <form class="formContain" [formGroup]="offerForm" (ngSubmit)="onSubmit()" *ngIf="showForm1">
+        <h1>Step 1: Add Offer</h1>
+        <hr>
+      <div class="form-group">
+        <label for="offerName">Enter offer Name</label>
+        <input type="text" id="offerName" formControlName="offerName">
+        <span class="error" *ngIf="isInvalid('offerName')">Invalid Name</span>
+      </div>
+      <div class="form-group">
+        <label for="offerDescription">Enter offer Description</label>
+        <input type="text" id="offerDescription" formControlName="offerDescription">
+        <span class="error" *ngIf="isInvalid('offerDescription')">Invalid Description</span>
+      </div>
+      <div class="form-group">
+        <label for="offerType">Offer Type</label>
+        <select id="offerType" formControlName="offerType">
+          <option value="Unlimited">Unlimited</option>
+          <option value="Topup">Topup</option>
+          <option value="Validity">Validity</option>
+          <option value="OTT Offers">OTT Offers</option>
+        </select>
+        <span class="error" *ngIf="isInvalid('offerType')">Invalid Type</span>
+      </div>
+      <div class="form-group datefield">
+        <label for="activationDate">Activation Date (dd-MM-yyyy)</label>
+        <input type="date" id="activationDate" formControlName="activationDate" required>
+        <span class="error" *ngIf="isInvalid('activationDate')">Invalid Activation Date</span>
+      </div>
+      <div class="form-group datefield">
+        <label for="expirationDate">Expiration Date (dd-MM-yyyy)</label>
+        <input type="date" id="expirationDate" formControlName="expirationDate" required>
+        <span class="error" *ngIf="isInvalid('expirationDate')">Invalid Expiration Date</span>
+      </div>
+      
+      <button type="submit">Next</button>
+    </form>
+  </div>
+
+  <!--              Second form                          --> 
+
+  <div class="card-container" *ngIf="!showForm1">
+    <div class="card">
+      <h2>Offer Details</h2>
+      <hr>
+      <p><strong>Offer Name:</strong> {{ offerForm.value.offerName ?? '' }}</p>
+      <p><strong>Offer Description:</strong> {{ offerForm.value.offerDescription ?? '' }}</p>
+      <p><strong>Offer Type:</strong> {{ offerForm.value.offerType ?? '' }}</p>
+      <p><strong>Activation Date:</strong> {{ offerForm.value.activationDate ?? '' }}</p>
+      <p><strong>Expiration Date:</strong> {{ offerForm.value.expirationDate ?? '' }}</p>
+    </div>
+    
+    <div class="card" *ngFor="let suboffer of form2Data">
+      <h2>Sub-Offer Details</h2>
+      <hr>
+      <p><strong>SubOffer Name :</strong> {{ suboffer.subOfferName ?? '' }}</p>
+      <p><strong>Price:</strong> {{ suboffer.validity ?? '' }}</p>
+      <p><strong>Validity:</strong> {{ suboffer.price ?? '' }}</p>
+      <p><strong>Parent Relation:</strong> {{ suboffer.parentRelation ?? '' }}</p>
+    </div>
+  </div>
+  <div class="form-container">
+    <form class="formContain" [formGroup]="subofferForm" (ngSubmit)="finish()" *ngIf="!showForm1">
+        <h1>Step 2: Add Sub Offer</h1>
+        <hr>
+      <div class="form-group">
+        <label for="subOfferName">Enter Sub offer Name</label>
+        <input type="text" id="subOfferName" formControlName="subOfferName">
+        <span class="error" *ngIf="issubInvalid('subOfferName')">Invalid Sub offer Name</span>
+      </div>
+      <div class="form-group">
+        <label for="price">Enter sub offer Price</label>
+        <input type="text" id="price" formControlName="price">
+        <span class="error" *ngIf="issubInvalid('price')">Invalid price</span>
+      </div>
+      <div class="form-group">
+        <label for="validity">Enter Validity</label>
+        <input type="text" id="validity" formControlName="validity">
+        <span class="error" *ngIf="issubInvalid('validity')">Invalid Validity (should be multiple of weeks.)</span>
+      </div>
+      <div class="form-group">
+        <label for="parentRelation">Parent Relation</label>
+        <select id="parentRelation" formControlName="parentRelation">
+            <option value="D">Default</option>
+            <option value="M">Mandatory</option>
+            <option value="O">Optional</option>
+        </select>
+        <span class="error" *ngIf="issubInvalid('parentRelation')">Invalid Type</span>
+      </div>
+      <button type="submit">Submit</button>
+      <button type="submit"  (click)="addSuboffer()">Add more Suboffers</button>
+    </form>
+  </div>
+  

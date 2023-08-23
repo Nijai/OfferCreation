@@ -1,0 +1,25 @@
+.header {
+    background-color: white;
+    color: #08ACAC; /* Adjust the text color as needed */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1); /* Adding a slight shadow */
+  }
+  
+  .header nav a {
+    color: #08ACAC; /* Adjust the link color as needed */
+    text-decoration: none;
+    margin: 20px;
+  }
+
+  .header nav a:first-child {
+    margin-left: 0;
+  }
+  
+  .logo {
+    margin-left: 1%;
+    width: 150px; /* Adjust the width as needed */
+    height: auto; /* This maintains the aspect ratio */
+  }
+  

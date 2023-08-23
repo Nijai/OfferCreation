@@ -1,0 +1,7 @@
+package com.offer.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface IOfferRepository extends JpaRepository<T, ID> {
+
+}

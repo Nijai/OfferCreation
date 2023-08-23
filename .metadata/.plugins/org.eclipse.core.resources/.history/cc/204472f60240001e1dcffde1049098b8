@@ -1,0 +1,16 @@
+package com.offer.model;
+
+import javax.validation.ConstraintValidator;
+import javax.validation.ConstraintValidatorContext;
+import java.util.regex.Pattern;
+
+public class OfferNameValidator implements ConstraintValidator<Offer.OfferNameValidation, String> {
+
+    private static final String NAME_REGEX = "^[\\w\\s-\\$]*$"; // Allow letters, numbers, spaces, hyphens, and dollar signs
+
+    @Override
+    public boolean isValid(String value, ConstraintValidatorContext context) {
+        return value != null && Pattern.matches(NAME_REGEX, value);
+    }
+}
+

@@ -1,0 +1,17 @@
+package com.offer.model;
+
+@ControllerAdvice
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
+
+    @ExceptionHandler(DateTimeParseException.class)
+    public ResponseEntity<?> handleDateTimeParseException(DateTimeParseException ex) {
+        String errorMessage = "Invalid Date Format; Valid format is 'dd-MM-yyyy'"; // Custom error message
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+        String errorMessage = "Request body is not readable; Please check the request format"; // Custom error message
+        return new ResponseEntity<>(errorMessage, HttpStatus.BAD_REQUEST);
+    }
+}

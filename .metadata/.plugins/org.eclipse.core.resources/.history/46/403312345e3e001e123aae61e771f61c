@@ -1,0 +1,12 @@
+package com.offer.model;
+
+public class CustomDateDeserializer extends JsonDeserializer<LocalDate> {
+    private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+
+    @Override
+    public LocalDate deserialize(JsonParser jsonParser, DeserializationContext deserializationContext) throws IOException {
+        String dateString = jsonParser.getText();
+        return LocalDate.parse(dateString, DATE_FORMAT);
+    }
+}
+

@@ -1,0 +1,10 @@
+package com.offer.model;
+
+import jakarta.validation.ConstraintValidatorContext;
+
+public class ValidValidityMultipleValidator implements ConstraintValidator<ValidValidityMultiple, Integer> {
+    @Override
+    public boolean isValid(Integer value, ConstraintValidatorContext context) {
+        return value % 7 == 0; // Check if the value is a multiple of 7 (days in a week)
+    }
+}

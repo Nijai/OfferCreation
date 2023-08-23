@@ -1,0 +1,29 @@
+package com.offer.repository;
+
+import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import com.offer.model.Offer;
+
+@Repository
+public interface IOfferRepository extends JpaRepository<Offer, Long> {
+
+	List<Offer> findByActivationDateBeforeAndExpirationDateAfter(Date currentDate, Date currentDate2);
+	
+	@Query("SELECT o FROM Offer o LEFT JOIN FETCH o.subOffers s " +
+	           "WHERE (o.activationDate <= CURRENT_DATE) AND (o.expirationDate >= CURRENT_DATE OR o.expirationDate IS NULL) " +
+	           "OR (s.activationDate <= CURRENT_DATE) AND (s.expirationDate >= CURRENT_DATE OR s.expirationDate IS NULL)")
+	    List<Offer> findActiveOffersAndSubOffers();
+	    
+	    @Query("SELECT o FROM Offer o LEFT JOIN FETCH o.subOffers s " +
+	           "WHERE (o.activationDate <= CURRENT_DATE) AND (o.expirationDate >= CURRENT_DATE OR o.expirationDate IS NULL) " +
+	           "OR (s.activationDate <= CURRENT_DATE) AND (s.expirationDate >= CURRENT_DATE OR s.expirationDate IS NULL) " +
+	           "AND o.id = :offerId")
+	    Offer findActiveOfferWithSubOffers(@Param("offerId") Long offerId);
+}

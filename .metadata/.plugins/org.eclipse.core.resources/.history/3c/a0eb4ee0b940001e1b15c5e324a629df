@@ -1,0 +1,188 @@
+package com.offer.service;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.offer.exception.InvalidSubOfferNameException;
+import com.offer.exception.InvalidValidityException;
+import com.offer.exception.ParentRelationModificationException;
+import com.offer.exception.SubOfferNameAlreadyExistsException;
+import com.offer.exception.SubOfferNotFoundException;
+import com.offer.model.Offer;
+import com.offer.model.OfferNameValidator;
+import com.offer.model.ParentRelation;
+import com.offer.model.*;
+import com.offer.repository.ISubOfferRepository;
+
+import jakarta.transaction.Transactional;
+
+@Service
+public class subOfferServiceImpl implements ISubOfferService {
+	
+	@Autowired
+    private ISubOfferRepository subOfferRepo;
+	
+	
+    @Override
+    public SubOffer addSubOffer(SubOffer subOffer) {
+    	OfferNameValidator validator = new OfferNameValidator();
+    	ValidityValidator validatorValidity = new ValidityValidator();
+    	
+        if(!validator.isValid(subOffer.getSubOfferName(),null)) {
+        	throw new InvalidSubOfferNameException("Sub Offer Name should not exceed 30 characters and can only contain letters, numbers, spaces, hyphens, and dollar signs");
+        }
+        if(!validatorValidity.isValid(subOffer.getValidity(), null)) {
+        	throw new InvalidValidityException("Invalid Validity; Validity should be in multiples of a week");
+        }
+        
+        SubOffer existingSubOffer = subOfferRepo.findBySubOfferName(subOffer.getSubOfferName());
+    	if (existingSubOffer != null) {
+            throw new SubOfferNameAlreadyExistsException("Sub Offer with name '" + subOffer.getSubOfferName() + "' already exists.");
+        }
+        
+        return this.subOfferRepo.save(subOffer);
+    }
+
+	@Override
+	public SubOffer updateSubOffer(SubOffer updatedSubOffer) {
+	    Optional<SubOffer> existingSubOfferOpt = subOfferRepo.findById(updatedSubOffer.getSubOfferId());
+
+	    if (existingSubOfferOpt.isPresent()) {
+	        SubOffer existingSubOffer = existingSubOfferOpt.get();
+
+	        // Allow updates for all fields except Parent Relation
+	        if(existingSubOffer.getSubOfferName()!=null) {
+	        	existingSubOffer.setSubOfferName(updatedSubOffer.getSubOfferName());
+	        }
+	        
+	        if(existingSubOffer.getPrice()!=null) {
+	        	existingSubOffer.setPrice(updatedSubOffer.getPrice());
+	        }
+	        
+	        if(existingSubOffer.getValidity()!=null) {
+	        	existingSubOffer.setValidity(updatedSubOffer.getValidity());
+	        }
+	        
+
+	        // Check if Parent Relation is O/D and throw exception if M is being updated
+	        if ((existingSubOffer.getParentRelation() == ParentRelation.O || existingSubOffer.getParentRelation() == ParentRelation.D)
+	                && updatedSubOffer.getParentRelation() == ParentRelation.M) {
+	            throw new ParentRelationModificationException("Cannot modify Parent Relation from O/D to M.");
+	        } else if (existingSubOffer.getParentRelation() == ParentRelation.M
+	                && (updatedSubOffer.getParentRelation() == ParentRelation.O || updatedSubOffer.getParentRelation() == ParentRelation.D)) {
+	            throw new ParentRelationModificationException("Cannot modify Parent Relation from M to O/D.");
+	        }
+	        
+	        // Update Parent Relation if no O/D->M modification
+	        existingSubOffer.setParentRelation(updatedSubOffer.getParentRelation());
+
+	        return subOfferRepo.save(existingSubOffer);
+	    } else {
+	        throw new RuntimeException("SubOffer not found with ID: " + updatedSubOffer.getSubOfferId());
+	    }
+	}
+
+
+	@Transactional
+	@Override
+	public SubOffer getSubOfferById(Long subOfferId) {
+	    Optional<SubOffer> subOffer = subOfferRepo.findById(subOfferId);
+	    if (subOffer.isPresent()) {
+	        return subOffer.get();
+	    } else {
+	        throw new SubOfferNotFoundException("SubOffer not found with ID: " + subOfferId);
+	    }
+	}
+
+
+	@Override
+    public List<SubOffer> getAllSubOffers() {
+        return this.subOfferRepo.findAll();
+    }
+
+	 @Override
+	    public String deleteSubOffer(Long subOfferId) {
+	        Optional<SubOffer> subOffer = this.subOfferRepo.findById(subOfferId);
+	        Long offerId =subOffer.get().getOffer().getId();
+	        List<SubOffer> relatedSubOffers = this.subOfferRepo.findByOffer_Id(offerId);
+	        System.out.println(relatedSubOffers);
+	        System.out.println(relatedSubOffers.size());
+	        if (subOffer.isPresent()) {
+	        	if(relatedSubOffers.size()>1) {
+	        		this.subOfferRepo.delete(subOffer.get());
+		            return "SubOffer with ID " + subOfferId + " deleted successfully.";
+	        	}else{
+	        		return "At least One suboffer should be present for offerID" + offerId;
+	        	}
+	        }else {
+	            return "SubOffer with ID " + subOfferId + " not found.";
+	        }
+	    }
+
+	@Override
+	public List<SubOffer> getSubOffersByOfferId(Long offerId) {
+		return this.subOfferRepo.findOfferWithSubOffers(offerId);
+	}
+
+	@Override
+	public List<SubOffer> getOptionalSubOffersByOfferId(Long offer_id) {
+		return this.subOfferRepo.findByOfferIdAndParentRelation(offer_id, ParentRelation.O);
+	}
+
+	@Override
+	public ResponseEntity<?> getAmountToBePaid(Long offer_id, String suboffers) {
+		String[] variableArray = suboffers.split(",");
+        double amount = 0;
+        
+        for (String variable : variableArray) {
+        	if(variable == "0") {
+        		break;
+        	}
+        	SubOffer suboffer = this.getSubOfferById(Long.parseLong(variable));
+        	if(offer_id ==suboffer.getOffer().getId()) {
+        		if( suboffer.getParentRelation()== ParentRelation.O) {
+	        	
+	        		System.out.println("Yes");
+	        	
+	        		amount = amount + suboffer.getPrice();
+	        	}else {
+	        		continue;
+	        	}
+        		
+        	}else {
+        		return new ResponseEntity<>("Suboffer ID "+suboffer.getSubOfferId()+" Not present in "+offer_id,HttpStatus.NOT_FOUND);
+        	}
+        }
+        
+        List<SubOffer> offers = this.getSubOffersWithParentRelation(offer_id);
+        
+        
+        for(SubOffer of:offers) {
+        	amount = amount + of.getPrice();
+        }
+        
+        return new ResponseEntity<>("Amount to be Paid "+amount,HttpStatus.OK);
+	}
+
+	@Override
+	public List<SubOffer> getSubOffersWithParentRelation(Long offerId) {
+		 // Call the repository method to fetch sub offers with parent relation "D"
+	    List<SubOffer> subOffersD = this.subOfferRepo.findByOfferIdAndParentRelation(offerId, ParentRelation.D);
+	    
+	    // Call the repository method to fetch sub offers with parent relation "M"
+	    List<SubOffer> subOffersM = this.subOfferRepo.findByOfferIdAndParentRelation(offerId, ParentRelation.M);
+	    
+	    // Combine the two lists
+	    subOffersD.addAll(subOffersM);
+	    
+	    return subOffersD;
+	}
+	 
+	 
+
+}

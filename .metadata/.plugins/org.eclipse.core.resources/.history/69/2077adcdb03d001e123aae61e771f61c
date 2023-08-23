@@ -1,0 +1,7 @@
+package com.offer.repository;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface ISubOfferRepository extends JpaRepository<subSubOffer, Long> {
+
+}

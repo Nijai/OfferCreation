@@ -1,0 +1,5 @@
+package com.offer.controller;
+
+public class OfferTypeValidator {
+
+}

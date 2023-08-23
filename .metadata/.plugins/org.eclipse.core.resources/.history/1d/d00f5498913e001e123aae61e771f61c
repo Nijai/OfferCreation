@@ -1,0 +1,51 @@
+package com.offer.model;
+
+package com.offer.model;
+
+import com.fasterxml.jackson.core.JsonGenerator;
+import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.SerializerProvider;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+
+@Configuration
+public class JacksonConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        
+        // Configure serialization and deserialization features
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+        objectMapper.disable(DeserializationFeature.ADJUST_DATES_TO_CONTEXT_TIME_ZONE);
+
+        // Configure the date format
+        JavaTimeModule javaTimeModule = new JavaTimeModule();
+        
+        // Add custom deserializer for LocalDate
+        javaTimeModule.addDeserializer(LocalDate.class, new CustomDateDeserializer());
+        
+        // Add custom serializer for LocalDate
+        javaTimeModule.addSerializer(LocalDate.class, new ToStringSerializer() {
+            @Override
+            public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+                gen.writeString(((LocalDate) value).format(DateTimeFormatter.ofPattern("dd-MM-yyyy")));
+            }
+        });
+        
+        objectMapper.registerModule(javaTimeModule);
+
+        return objectMapper;
+    }
+}
+
+

@@ -1,0 +1,20 @@
+package com.offer.model;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.Constraint;
+import jakarta.validation.Payload;
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
+
+@Target({ElementType.FIELD, ElementType.METHOD, ElementType.PARAMETER})
+@Retention(RetentionPolicy.RUNTIME)
+@Constraint(validatedBy = ValidValidityMultipleValidator.class)
+public @interface ValidValidityMultiple {
+    String message() default "Validity should be in multiples of a week";
+    Class<?>[] groups() default {};
+    Class<? extends Payload>[] payload() default {};
+}

@@ -1,0 +1,14 @@
+package com.offer.repository;
+
+import java.time.LocalDate;
+import java.util.List;
+
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import com.offer.model.Offer;
+
+public interface IOfferRepository extends JpaRepository<Offer, Long> {
+
+	List<Offer> findByActivationDateBeforeAndExpirationDateAfter(LocalDate currentDate, LocalDate currentDate2);
+
+}

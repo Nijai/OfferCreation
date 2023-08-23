@@ -1,0 +1,126 @@
+<div class="card-container">
+    <div class="cards">
+      <div *ngFor="let offer of offers" class="card">
+        <div class="ribbon">{{ offer.offerName }}</div>
+        <div class="card-content">
+          <h3>{{ offer.offerDescription }}</h3>
+          <p><strong>Offer Type:</strong> {{ offer.offerType }}</p>
+          <p class="flash-text"><strong>Offer Valid till:</strong> {{ offer.expirationDate }}</p>
+          <button (click)="selectOffer(offer)" class="select-button">Select</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div *ngIf="selectedOffer" class="selected-offer-details">
+    <div class="upper-section card">
+      <h2>Selected Offer Details</h2>
+      <h3 style="color:#08ACAC;">{{ selectedOffer.offerName }}</h3>
+      <p style="color:#036969;"><em>{{ selectedOffer.offerDescription }}</em></p>
+      <p><strong>Offer Type:</strong> {{ selectedOffer.offerType }}</p>
+      <p class="flash-text"><strong>Offer Valid till:</strong> {{ selectedOffer.expirationDate }}</p>
+      <div class="button-container">
+      <button class="add-offer" (click)=" openOffer(selectedOffer)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+        <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+      </svg></button>
+      <button class="delete-offer" (click)="deleteOffer(selectedOffer.id)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+        <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+      </svg></button>
+    </div>
+    </div>
+    <div *ngIf="showSnackbar" class="snackbar">
+      {{ snackbarMessage }}
+    </div>
+    <h2>Edit Suboffers (Optional)</h2>
+    <div class="suboffer-cards">
+      <div *ngFor="let subOffer of selectedOffer.subOffers" class="suboffer-card">
+        <div class="suboffer">
+          <h4 style="color:#08ACAC;">{{ subOffer.subOfferName }}</h4>
+          <p>Price: {{ subOffer.price }}</p>
+          <p>Validity: {{ subOffer.validity }} days</p>
+          <button class="add-button" [disabled]="subOffer.parentRelation === 'M'" (click)="openSuboffer(subOffer)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil" viewBox="0 0 16 16">
+            <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+          </svg></button>
+          <button class="delete-button"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash3-fill" viewBox="0 0 16 16">
+            <path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L2.038 3.5H1.5a.5.5 0 0 1 0-1H5v-1A1.5 1.5 0 0 1 6.5 0h3A1.5 1.5 0 0 1 11 1.5Zm-5 0v1h4v-1a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5ZM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06Zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528ZM8 4.5a.5.5 0 0 0-.5.5v8.5a.5.5 0 0 0 1 0V5a.5.5 0 0 0-.5-.5Z"/>
+          </svg></button>
+        </div>
+      </div>
+    </div>
+  </div>
+<!--               -------FORMS---------------------------                              --->
+<div class="overlay" *ngIf="showForm1">
+    <div class="form-container">
+    <button class="close-button" (click)="closeOfferForm()">Close</button> <!-- Close button -->
+    <form class="formContain" [formGroup]="offerForm">
+        <h1>Update Offer</h1>
+        <hr>
+      <div class="form-group">
+        <label for="offerName">Enter offer Name</label>
+        <input type="text" id="offerName" formControlName="offerName" [class.disabled-select]="true">
+      </div>
+      <div class="form-group">
+        <label for="offerDescription">Enter offer Description</label>
+        <input type="text" id="offerDescription" formControlName="offerDescription" [class.disabled-select]="true">
+      </div>
+      <div class="form-group">
+        <label for="offerType" >Offer Type</label>
+        <select id="offerType" formControlName="offerType" [class.disabled-select]="true">
+          <option value="Unlimited">Unlimited</option>
+          <option value="Topup">Topup</option>
+          <option value="Validity">Validity</option>
+          <option value="OTT Offers">OTT Offers</option>
+        </select>
+      </div>
+      <div class="form-group datefield">
+        <label for="activationDate">Activation Date (dd-MM-yyyy)</label>
+        <input type="date" id="activationDate" formControlName="activationDate">
+        <span class="error" *ngIf="isInvalid('activationDate')">Invalid Activation Date</span>
+      </div>
+      <div class="form-group datefield">
+        <label for="expirationDate">Expiration Date (dd-MM-yyyy)</label>
+        <input type="date" id="expirationDate" formControlName="expirationDate">
+        <span class="error" *ngIf="isInvalid('expirationDate')">Invalid Expiration Date</span>
+      </div>
+      
+      <button type="submit" (click)="updateOffer()">Submit</button>
+    </form>
+  </div>
+</div>
+
+  <!--              Second form                          --> 
+  <div class="overlay" *ngIf="showForm2">
+  <div class="form-container">
+    <button class="close-button" (click)="closeSubofferForm()">Close</button> 
+    <form class="formContain" [formGroup]="subofferForm" *ngIf="!showForm1">
+        <h1>Update Sub Offer</h1>
+        <hr>
+      <div class="form-group">
+        <label for="subOfferName">Enter Sub offer Name</label>
+        <input type="text" id="subOfferName" formControlName="subOfferName">
+        <span class="error" *ngIf="issubInvalid('subOfferName')">Invalid Sub offer Name</span>
+      </div>
+      <div class="form-group">
+        <label for="price">Enter sub offer Price</label>
+        <input type="text" id="price" formControlName="price">
+        <span class="error" *ngIf="issubInvalid('price')">Invalid price</span>
+      </div>
+      <div class="form-group">
+        <label for="validity">Enter Validity</label>
+        <input type="text" id="validity" formControlName="validity">
+        <span class="error" *ngIf="issubInvalid('validity')">Invalid Validity (should be multiple of weeks.)</span>
+      </div>
+      <div class="form-group">
+        <label for="parentRelation">Parent Relation</label>
+        <select id="parentRelation" formControlName="parentRelation">
+            <option value="D">Default</option>
+            <option value="O">Optional</option>
+        </select>
+        <span class="error" *ngIf="issubInvalid('parentRelation')">Invalid Type</span>
+      </div>
+      <button type="submit" (click)="updateSubOffer()">Submit</button>
+    </form>
+  </div>
+  </div>
+  
+  

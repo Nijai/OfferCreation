@@ -1,0 +1,23 @@
+.button-container {
+  display: flex;
+  flex-direction: row; /* Change to row */
+  align-items: center;
+  justify-content: center;
+  margin-top: 10vh;
+}
+
+.big-button {
+  padding: 20px 40px;
+  font-size: 18px;
+  margin: 10px;
+  background-color: #08ACAC;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.big-button:hover {
+  background-color: #0B7E7E;
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.3);
+}

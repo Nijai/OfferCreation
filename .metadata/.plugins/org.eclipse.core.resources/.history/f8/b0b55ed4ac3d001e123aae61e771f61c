@@ -1,0 +1,32 @@
+package com.offer.model;
+
+import jakarta.persistence.*;
+
+@Entity
+@Table(name = "Table_subOffer")
+public class SubOffer {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "SubOffer_Id")
+    private Long id;
+
+    @Column(name = "Sub_OfferName", length = 30)
+    private String subOfferName;
+
+    @Column(name = "Price")
+    private Double price;
+
+    @Column(name = "Validity")
+    private Integer validity;
+
+    @ManyToOne
+    @JoinColumn(name = "Offer_Id")
+    private Offer offer;
+
+    @Column(name = "Parent_Relation")
+    @Enumerated(EnumType.STRING)
+    private ParentRelation parentRelation;
+
+    // Getters and setters
+}
